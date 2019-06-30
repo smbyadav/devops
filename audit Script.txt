@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# Name:         lunar (Lockdown UNix Auditing and Reporting)
+# Version:      7.5.0
+# Release:      1
+# License:      CC-BA (Creative Commons By Attribution)
+#               http://creativecommons.org/licenses/by/4.0/legalcode
+# Group:        System
+# Source:       N/A
+# URL:          http://lateralblast.com.au/
+# Distribution: Solaris, Red Hat Linux, SuSE Linux, Debian Linux,
+#               Ubuntu Linux, Mac OS X, AIX, FreeBSD, ESXi
+# Vendor:       UNIX
+# Packager:     Richard Spindler <richard@lateralblast.com.au>
+# Description:  Audit script based on various benchmarks
+#               Addition improvements added
+#               Written in bourne shell so it can be run on different releases
+
+# No warranty is implied or given with this script
+# It is based on numerous security guidelines
+# As with any system changes, the script should be vetted and
+# changed to suit the environment in which it is being used
+
+# Unless your organization is specifically using the service, disable it.
+# The best defense against a service being exploited is to disable it.
+
+# Even if a service is set to off the script will audit the configuration
+# file so that if a service is re-enabled the configuration is secure
+# Where possible checks are made to make sure the package is installed
+# if the package is not installed the checks will not be run
+
+# To do:
+#
+# - nosuid,noexec for Linux
+# - Disable user mounted removable filesystems for Linux
+# - Disable USB devices for Linux
+# - Grub password
+# - Restrict NFS client requests to privileged ports Linux
+
+# Solaris Release Information
+#  1/06 U1
+#  6/06 U2
+# 11/06 U3
+#  8/07 U4
+#  5/08 U5
+# 10/08 U6
+#  5/09 U7
+# 10/09 U8
+#  9/10 U9
+#  8/11 U10
+#  1/13 U11
+
+# audit_mode = 1 : Audit Mode
+# audit_mode = 0 : Lockdown Mode
+# audit_mode = 2 : Restore Mode
+
+# Defaults for AWS
+
+aws_iam_master_role="iam-master"
+aws_iam_manager_role="iam-manager"
+aws_cloud_trail_name="aws-audit-log"
+sns_protocol="email"
+sns_endpoint="alerts@company.com"
+valid_tag_string="(ue1|uw1|uw2|ew1|ec1|an1|an2|as1|as2|se1)-(d|t|s|p)-([a-z0-9\-]+)$"
+aws_region=""
+aws_rds_min_retention="7"
+aws_ec2_min_retention="7"
+aws_ec2_max_retention="30"
+aws_days_to_key_deletion="7"
+
+# Set up some global variables
+
+app_dir=$(dirname $0)
+args=$@
+secure=0
+insecure=0
+total=0
+syslog_server=""
+syslog_logdir=""
+pkg_company="LTRL"
+pkg_suffix="lunar"
+base_dir="/opt/$pkg_company$pkg_suffix"
+date_suffix=`date +%d_%m_%Y_%H_%M_%S`
+work_dir="$base_dir/
